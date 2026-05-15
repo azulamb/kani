@@ -288,6 +288,56 @@
       font-family: inherit;
     }
     .selected-delete:hover { color: #e07070; }
+
+    /* ── Mobile ───────────────────────────────────── */
+    @media (max-width: 600px) {
+      body { padding: 16px 12px 200px; }
+      header { margin-bottom: 22px; }
+      header h1 { font-size: 1.35em; }
+
+      /* ツリーのインデントを縮小 */
+      .children { padding-left: 18px; }
+      .children::before { left: 6px; }
+      .children > .node { padding-left: 12px; }
+      .children > .node::before { width: 12px; }
+
+      /* 英語学名を非表示 */
+      .node-label-en { display: none; }
+
+      /* カードグリッドのパディング縮小 */
+      .crab-grid { padding-left: 10px; gap: 8px; }
+
+      /* 右パネルを画面下部に固定 */
+      #main-layout { display: block; }
+      #right-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: none;
+        background: #0d1b2a;
+        border-top: 1px solid #2e4a62;
+        padding: 8px 12px 16px;
+        z-index: 100;
+        box-shadow: 0 -6px 24px rgba(0,0,0,.5);
+      }
+      #selected-list {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+      }
+      .selected-card {
+        flex-shrink: 0;
+        width: 110px;
+        margin-bottom: 0;
+        scroll-margin-inline: 4px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -858,7 +908,7 @@ function revealInTree(el) {
 
 function addToPanel(crab, leftCard) {
   if (selectedCrabs.has(crab.sci)) {
-    selectedCrabs.get(crab.sci).panelCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    selectedCrabs.get(crab.sci).panelCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     return;
   }
 
@@ -890,12 +940,11 @@ function addToPanel(crab, leftCard) {
   panelCard.addEventListener('click', e => {
     if (e.target.closest('button')) return;
     revealInTree(leftCard);
-    leftCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    leftCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   });
 
   document.getElementById('selected-list').appendChild(panelCard);
   selectedCrabs.set(crab.sci, { panelCard, leftCard });
-  panelCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function makePh() {
