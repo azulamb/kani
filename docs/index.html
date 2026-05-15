@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>短尾下目（カニ）系統樹</title>
+  <title>カニっぽいの</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -173,6 +173,9 @@
     .crab-jp   { font-size: 11.5px; font-weight: 700; color: #c8dce8; }
     .crab-sci  { font-size: 10px; font-style: italic; color: #567a90; margin-top: 2px; }
     .crab-desc { font-size: 10px; color: #4a6878; margin-top: 3px; line-height: 1.4; }
+    .crab-wiki { margin-top: 5px; text-align: right; }
+    .crab-wiki a { font-size: 9px; color: #2e5a78; text-decoration: none; }
+    .crab-wiki a:hover { color: #7ecef4; }
 
     /* ── Legend ───────────────────────────────── */
     .legend {
@@ -216,28 +219,103 @@
       color: #3a5568;
     }
     footer a { color: #4a7fa0; }
+
+    /* ── Two-column layout ────────────────────────── */
+    #main-layout { display: flex; align-items: flex-start; gap: 20px; }
+    #left-col { flex: 1; min-width: 0; }
+    #right-panel {
+      width: 160px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .right-panel-title {
+      font-size: 10.5px;
+      color: #4a7fa0;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #1e3a52;
+      margin-bottom: 10px;
+    }
+
+    /* ── Selected cards (right panel) ────────────── */
+    .selected-card {
+      background: #111e2d;
+      border: 1px solid #1e3a52;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      scroll-margin-top: 8px;
+    }
+    .selected-card img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      display: block;
+      background: #0a1520;
+    }
+    .selected-img-ph {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: #0a1520;
+      color: #2a4a62;
+    }
+    .selected-card-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #c8dce8;
+      padding: 5px 6px 4px;
+    }
+    .selected-delete {
+      display: block;
+      width: 100%;
+      background: none;
+      border: none;
+      border-top: 1px solid #1a3248;
+      color: #4a6878;
+      font-size: 10px;
+      padding: 4px 0;
+      cursor: pointer;
+      text-align: center;
+      font-family: inherit;
+    }
+    .selected-delete:hover { color: #e07070; }
   </style>
 </head>
 <body>
 <header>
-  <h1>🦀 短尾下目（Brachyura）系統樹</h1>
+  <h1>🦀 カニっぽいの 🦀</h1>
   <p>Tsang et al. (2014) に基づく主要分類群と代表種</p>
 </header>
 
-<div class="legend">
-  <div class="legend-item"><span class="badge badge-infraorder">下目</span> 下目</div>
-  <div class="legend-item"><span class="badge badge-section">群</span> 群</div>
-  <div class="legend-item"><span class="badge badge-subsection">亜群</span> 亜群</div>
-  <div class="legend-item"><span class="badge badge-superfamily">上科</span> 上科</div>
-  <div class="legend-item"><span class="badge badge-family">科</span> 科（クリックで画像表示）</div>
+<div id="main-layout">
+  <div id="left-col">
+    <div class="legend">
+      <div class="legend-item"><span class="badge badge-infraorder">下目</span> 下目</div>
+      <div class="legend-item"><span class="badge badge-section">群</span> 群</div>
+      <div class="legend-item"><span class="badge badge-subsection">亜群</span> 亜群</div>
+      <div class="legend-item"><span class="badge badge-superfamily">上科</span> 上科</div>
+      <div class="legend-item"><span class="badge badge-family">科</span> 科（クリックで展開）</div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="setAll(true)">すべて展開</button>
+      <button class="btn" onclick="setAll(false)">すべて折りたたむ</button>
+    </div>
+    <div id="tree" class="tree"></div>
+  </div>
+  <aside id="right-panel">
+    <div class="right-panel-title">選択中</div>
+    <div id="selected-list"></div>
+  </aside>
 </div>
-
-<div class="controls">
-  <button class="btn" onclick="setAll(true)">すべて展開</button>
-  <button class="btn" onclick="setAll(false)">すべて折りたたむ</button>
-</div>
-
-<div id="tree" class="tree"></div>
 
 <footer>
   画像: <a href="https://commons.wikimedia.org/" target="_blank">Wikimedia Commons</a> ／
@@ -261,27 +339,27 @@ const BRACHYURA_DATA = {
       { name: 'カイカムリ上科', nameEn: 'Dromioidea', rank: 'superfamily', children: [
         { name: 'カイカムリ科', nameEn: 'Dromiidae', rank: 'family', crabs: [
           { jp: 'カイカムリ', sci: 'Dromia personata',
-            img: 'Dromia_personata.jpg',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Dromia_personata.jpg',
             desc: 'スポンジを切り取り背中に被せる習性で有名' },
           { jp: 'ミナミカイカムリ', sci: 'Dromia dormia',
-            img: 'Dromia_dormia.jpg',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Dromia_dormia%2C_the_sleepy_sponge_crab.jpg',
             desc: 'インド太平洋に広く分布する大型種' },
         ]},
         { name: 'トゲカイカムリ科', nameEn: 'Dynomenidae', rank: 'family', crabs: [
           { jp: 'トゲカイカムリ', sci: 'Dynomene hispida',
-            img: 'Dynomene_hispida.jpg',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Dynom%C3%A8ne_de_Latreille_%28Dynomene_hispida%29.jpg',
             desc: '体表に多数のトゲを持つ深海性の小型ガニ' },
         ]},
       ]},
       { name: 'ホモラ上科', nameEn: 'Homoloidea', rank: 'superfamily', children: [
         { name: 'ホモラ科', nameEn: 'Homolidae', rank: 'family', crabs: [
           { jp: 'ホモラ', sci: 'Homola barbata',
-            img: 'Homola_barbata.jpg',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/FMIB_35514_Homola_barbata.jpeg',
             desc: '深海に生息し物を背負う習性を持つ' },
         ]},
         { name: 'ミズヒキガニ科', nameEn: 'Latreilliidae', rank: 'family', crabs: [
           { jp: 'ミズヒキガニ', sci: 'Latreillia elegans',
-            img: 'Latreillia_elegans.jpg',
+            img: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Latreillia_elegans_su_Pennatula_rubra.jpg',
             desc: '水引のように細長い脚を持つ深海種' },
         ]},
       ]},
@@ -293,10 +371,10 @@ const BRACHYURA_DATA = {
     { name: 'アサヒガニ群', nameEn: 'Raninoida', rank: 'section', children: [
       { name: 'アサヒガニ科', nameEn: 'Raninidae', rank: 'family', crabs: [
         { jp: 'アサヒガニ', sci: 'Ranina ranina',
-          img: 'Ranina_ranina.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Ranina_ranina.jpg',
           desc: '前方に向かって素速く泳ぎ、砂に潜る' },
         { jp: 'ウサギガニ', sci: 'Lyreidus stenops',
-          img: 'Lyreidus_stenops.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Specimen_of_Lyreidus_stenops.jpg',
           desc: '後端が尖った細長い甲羅を持つ深海種' },
       ]},
     ]},
@@ -307,12 +385,11 @@ const BRACHYURA_DATA = {
     { name: 'マメヘイケガニ群', nameEn: 'Cyclodorippoida', rank: 'section', children: [
       { name: 'マメヘイケガニ科', nameEn: 'Cyclodorippidae', rank: 'family', crabs: [
         { jp: 'マメヘイケガニ', sci: 'Cyclodorippe astuta',
-          img: 'Cyclodorippe_astuta.jpg',
           desc: '小型で深海に生息する原始的なカニ' },
       ]},
       { name: 'ツノダシマメヘイケガニ科', nameEn: 'Cymonomidae', rank: 'family', crabs: [
         { jp: 'ツノダシマメヘイケガニ', sci: 'Cymonomus granulatus',
-          img: 'Cymonomus_granulatus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/FMIB_46962_Cymonomus_granulatus_%28A_M-Edw%29%2C_800_metres_de_profondeur.jpeg',
           desc: '長い角状の突起を持つ深海性の小型ガニ' },
       ]},
     ]},
@@ -328,18 +405,18 @@ const BRACHYURA_DATA = {
         { name: 'カラッパ上科', nameEn: 'Calappoidea', rank: 'superfamily', children: [
           { name: 'カラッパ科', nameEn: 'Calappidae', rank: 'family', crabs: [
             { jp: 'カラッパ', sci: 'Calappa hepatica',
-              img: 'Calappa_hepatica.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Calappa_hepatica.JPG',
               desc: '丸みを帯びた甲羅と特大のハサミを持ち、巻貝を切り開いて食べる' },
             { jp: 'トサカカラッパ', sci: 'Calappa gallus',
-              img: 'Calappa_gallus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Calappa-gallus-dorso.jpg',
               desc: 'ニワトリのとさか状の突起が甲羅後部に並ぶ' },
             { jp: 'ヤマトカラッパ', sci: 'Calappa japonica',
-              img: 'Calappa_japonica.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Calappa_japonica.jpg',
               desc: '日本近海固有種。砂泥底に生息し夜行性' },
           ]},
           { name: 'ヒメカラッパ科', nameEn: 'Matutidae', rank: 'family', crabs: [
             { jp: 'ヒメカラッパ', sci: 'Matuta victor',
-              img: 'Matuta_victor.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Matuta_victor_-_National_Museum_of_Nature_and_Science%2C_Tokyo_-_DSC06764_2.jpg',
               desc: '八本の脚が桨状に扁平で遊泳能力を持つ' },
           ]},
         ]},
@@ -347,10 +424,10 @@ const BRACHYURA_DATA = {
         { name: 'イチョウガニ上科', nameEn: 'Cancroidea', rank: 'superfamily', children: [
           { name: 'イチョウガニ科', nameEn: 'Cancridae', rank: 'family', crabs: [
             { jp: 'ヨーロッパイチョウガニ', sci: 'Cancer pagurus',
-              img: 'Cancer_pagurus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/7/71/Cancer_pagurus.jpg',
               desc: 'ヨーロッパの主要食用ガニ。甲長15cmに達する' },
             { jp: 'ダンジネスクラブ', sci: 'Metacarcinus magister',
-              img: 'Metacarcinus_magister.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Metacarcinus_magister.jpg',
               desc: '北米西岸の代表的食用ガニ。甲幅20cm超' },
           ]},
         ]},
@@ -358,10 +435,10 @@ const BRACHYURA_DATA = {
         { name: 'ヘイケガニ上科', nameEn: 'Cheiragonoidea', rank: 'superfamily', children: [
           { name: 'ヘイケガニ科', nameEn: 'Cheiragonidae', rank: 'family', crabs: [
             { jp: 'ヘイケガニ', sci: 'Heikea japonica',
-              img: 'Heikegani.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Heikegani.jpg',
               desc: '甲羅の模様が武士の顔に似ることで有名な日本の固有種' },
             { jp: 'クリガニ', sci: 'Telmessus cheiragonus',
-              img: 'Telmessus_cheiragonus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Telmessus_cheiragonus.jpg',
               desc: '北日本・北太平洋に生息する食用種。全身にトゲを持つ' },
           ]},
         ]},
@@ -369,7 +446,7 @@ const BRACHYURA_DATA = {
         { name: 'タコノマクラガニ上科', nameEn: 'Dorippoidea', rank: 'superfamily', children: [
           { name: 'タコノマクラガニ科', nameEn: 'Dorippidae', rank: 'family', crabs: [
             { jp: 'タコノマクラガニ', sci: 'Dorippe frascone',
-              img: 'Dorippe_frascone.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Dorippe_frascone.jpg',
               desc: 'ウニ殻などを後ろ足で挟み背負う習性を持つ' },
           ]},
         ]},
@@ -377,15 +454,14 @@ const BRACHYURA_DATA = {
         { name: 'スベスベマンジュウガニ上科', nameEn: 'Eriphioidea', rank: 'superfamily', children: [
           { name: 'スベスベマンジュウガニ科', nameEn: 'Eriphiidae', rank: 'family', crabs: [
             { jp: 'スベスベマンジュウガニ', sci: 'Etisus japonicus',
-              img: 'Etisus_japonicus.jpg',
               desc: '見た目と裏腹に猛毒（パリトキシン類）を蓄積する危険種' },
             { jp: 'エリフィア', sci: 'Eriphia verrucosa',
-              img: 'Eriphia_verrucosa.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Eriphia_verrucosa.jpg',
               desc: '岩礁帯に生息し強力なハサミでカキや貝を割る' },
           ]},
           { name: 'オオエビスガニ科', nameEn: 'Menippidae', rank: 'family', crabs: [
             { jp: 'フロリダイシガニ', sci: 'Menippe mercenaria',
-              img: 'Menippe_mercenaria.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/8/80/Florida_Stone_Crab_%28Menippe_mercenaria%29.jpg',
               desc: 'フロリダ産。ハサミだけを切り取り食用にする漁法で有名' },
           ]},
         ]},
@@ -393,10 +469,9 @@ const BRACHYURA_DATA = {
         { name: 'コブシガニ上科', nameEn: 'Leucosioidea', rank: 'superfamily', children: [
           { name: 'コブシガニ科', nameEn: 'Leucosiidae', rank: 'family', crabs: [
             { jp: 'コブシガニ', sci: 'Leucosia anatum',
-              img: 'Leucosia_anatum.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Leucosia_anatum_%28Pebble_crab%29.jpg',
               desc: '球形に近い卵型の甲羅を持ち砂泥底に生息' },
             { jp: 'ヒメコブシガニ', sci: 'Philyra platychira',
-              img: 'Philyra_platychira.jpg',
               desc: '小型で円形の甲羅を持つ内湾・干潟の種' },
           ]},
         ]},
@@ -404,23 +479,23 @@ const BRACHYURA_DATA = {
         { name: 'クモガニ上科', nameEn: 'Majoidea', rank: 'superfamily', children: [
           { name: 'クモガニ科', nameEn: 'Majidae', rank: 'family', crabs: [
             { jp: 'タカアシガニ', sci: 'Macrocheira kaempferi',
-              img: 'Macrocheira_kaempferi.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Macrocheira_kaempferi.jpg',
               desc: '現存する最大の節足動物。脚を広げると最大3.8m' },
             { jp: 'ヨーロッパクモガニ', sci: 'Maja squinado',
-              img: 'Maja_squinado.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/7/70/Maja_squinado.jpg',
               desc: 'ヨーロッパ地中海産の大型クモガニ。食用' },
           ]},
           { name: 'ズワイガニ科', nameEn: 'Oregoniidae', rank: 'family', crabs: [
             { jp: 'ズワイガニ', sci: 'Chionoecetes opilio',
-              img: 'Chionoecetes_opilio.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Chionoecetes_opilio.jpg',
               desc: '日本海・オホーツク海産の代表的な冬の味覚' },
             { jp: 'バイアスノウクラブ', sci: 'Chionoecetes bairdi',
-              img: 'Chionoecetes_bairdi.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Chionoecetes_bairdi.jpg',
               desc: 'アラスカ・北太平洋産の大型食用種' },
           ]},
           { name: 'ケセンガニ科', nameEn: 'Inachidae', rank: 'family', crabs: [
             { jp: 'ケセンガニ', sci: 'Inachus dorsettensis',
-              img: 'Inachus_dorsettensis.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Inachus_dorsettensis.jpg',
               desc: '長い脚と小さな甲を持つ蜘蛛形のカニ' },
           ]},
         ]},
@@ -428,18 +503,18 @@ const BRACHYURA_DATA = {
         { name: 'ワタリガニ上科', nameEn: 'Portunoidea', rank: 'superfamily', children: [
           { name: 'ワタリガニ科', nameEn: 'Portunidae', rank: 'family', crabs: [
             { jp: 'ガザミ', sci: 'Portunus trituberculatus',
-              img: 'Portunus_trituberculatus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Portunus_trituberculatus.jpg',
               desc: '日本最重要の食用ワタリガニ。第5歩脚が桨状' },
             { jp: 'ブルークラブ', sci: 'Callinectes sapidus',
-              img: 'Callinectes_sapidus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/c/c3/Callinectes_sapidus.jpg',
               desc: '北米大西洸岸の主要食用種。殻は青みを帯びる' },
             { jp: 'タイワンガザミ', sci: 'Charybdis japonica',
-              img: 'Charybdis_japonica.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/Charybdis_japonica.jpg',
               desc: '東アジアの内湾・岩礁帯に広く分布する食用種' },
           ]},
           { name: 'ミドリガニ科', nameEn: 'Carcinidae', rank: 'family', crabs: [
             { jp: 'ミドリガニ', sci: 'Carcinus maenas',
-              img: 'Carcinus_maenas.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/1/17/Carcinus_maenas.jpg',
               desc: '世界中に広まった最悪の侵略的外来種の一つ' },
           ]},
         ]},
@@ -447,12 +522,12 @@ const BRACHYURA_DATA = {
         { name: 'カワガニ上科', nameEn: 'Potamoidea', rank: 'superfamily', children: [
           { name: 'カワガニ科', nameEn: 'Potamidae', rank: 'family', crabs: [
             { jp: 'カワガニ', sci: 'Potamon fluviatile',
-              img: 'Potamon_fluviatile.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Potamon_fluviatile02.jpg',
               desc: 'ヨーロッパ淡水の代表的カニ。淡水一生涯' },
           ]},
           { name: 'サワガニ科', nameEn: 'Geothelphusidae', rank: 'family', crabs: [
             { jp: 'サワガニ', sci: 'Geothelphusa dehaani',
-              img: 'Geothelphusa_dehaani.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Geothelphusa_dehaani.jpg',
               desc: '日本固有の淡水ガニ。山間の清流に生息し直達発生' },
           ]},
         ]},
@@ -460,10 +535,10 @@ const BRACHYURA_DATA = {
         { name: 'オウギガニ上科', nameEn: 'Xanthoidea', rank: 'superfamily', children: [
           { name: 'オウギガニ科', nameEn: 'Xanthidae', rank: 'family', crabs: [
             { jp: 'オウギガニ', sci: 'Lophozozymus pictor',
-              img: 'Lophozozymus_pictor.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Specimen_of_Lophozozymus_pictor.JPG',
               desc: '鮮やかな赤い網目模様だが毒性が非常に高い' },
             { jp: 'キンセンガニ', sci: 'Zosimus aeneus',
-              img: 'Zosimus_aeneus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Zosimus_aeneus_R%C3%A9union.JPG',
               desc: 'インド太平洋分布。パリトキシン類を蓄積する有毒種' },
           ]},
         ]},
@@ -471,7 +546,7 @@ const BRACHYURA_DATA = {
         { name: 'イソオウギガニ上科', nameEn: 'Parthenopoidea', rank: 'superfamily', children: [
           { name: 'イソオウギガニ科', nameEn: 'Parthenopidae', rank: 'family', crabs: [
             { jp: 'イソオウギガニ', sci: 'Parthenope validus',
-              img: 'Parthenope_validus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Specimen_of_Parthenope_validus.JPG',
               desc: 'ハサミが極端に大きく変形した甲形態を持つ' },
           ]},
         ]},
@@ -479,7 +554,6 @@ const BRACHYURA_DATA = {
         { name: 'ムツハアシガニ上科', nameEn: 'Trapezioidea', rank: 'superfamily', children: [
           { name: 'ムツハアシガニ科', nameEn: 'Trapeziidae', rank: 'family', crabs: [
             { jp: 'サンゴガニ', sci: 'Trapezia ferruginea',
-              img: 'Trapezia_ferruginea.jpg',
               desc: 'ミドリイシサンゴと共生し、外敵からサンゴを守る' },
           ]},
         ]},
@@ -492,34 +566,34 @@ const BRACHYURA_DATA = {
         { name: 'イワガニ上科', nameEn: 'Grapsoidea', rank: 'superfamily', children: [
           { name: 'イワガニ科', nameEn: 'Grapsidae', rank: 'family', crabs: [
             { jp: 'イワガニ', sci: 'Pachygrapsus crassipes',
-              img: 'Pachygrapsus_crassipes.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/3/38/Pachygrapsus_crassipes.jpg',
               desc: '日本沿岸の岩礁帯に最も普通に見られるカニ' },
             { jp: 'サラサエガ', sci: 'Grapsus grapsus',
-              img: 'Grapsus_grapsus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Grapsus_grapsus.jpg',
               desc: 'ガラパゴス諸島の岩礁を彩る赤いカニ。素早い動き' },
           ]},
           { name: 'ベンケイガニ科', nameEn: 'Sesarmidae', rank: 'family', crabs: [
             { jp: 'アカテガニ', sci: 'Chiromantes haematocheir',
-              img: 'Chiromantes_haematocheir.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Chiromantes_haematocheir.jpg',
               desc: '鮮紅色のハサミが目印。秋に海へ放仔に向かう' },
             { jp: 'クロベンケイガニ', sci: 'Chiromantes dehaani',
-              img: 'Chiromantes_dehaani.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Kurobenkeigani_07i0156q.jpg',
               desc: 'マングローブ林や河口域に生息する陸生傾向の強い種' },
           ]},
           { name: 'モクズガニ科', nameEn: 'Varunidae', rank: 'family', crabs: [
             { jp: 'モクズガニ', sci: 'Eriocheir japonica',
-              img: 'Eriocheir_japonica.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Eriocheir_japonica.jpg',
               desc: '川で育ち海で産卵する日本産食用ガニ（上海蟹の近縁）' },
             { jp: 'シナモクズガニ', sci: 'Eriocheir sinensis',
-              img: 'Eriocheir_sinensis.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Eriocheir_sinensis.jpg',
               desc: '上海蟹として有名。欧米では侵略的外来種として問題' },
           ]},
           { name: 'オカガニ科', nameEn: 'Gecarcinidae', rank: 'family', crabs: [
             { jp: 'オカガニ', sci: 'Gecarcoidea lalandii',
-              img: 'Gecarcoidea_lalandii.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Specimen_of_Gecarcoidea_lalandii.JPG',
               desc: 'インド太平洋の熱帯林に生息する大型陸生ガニ' },
             { jp: 'クリスマスアカガニ', sci: 'Gecarcoidea natalis',
-              img: 'Christmas_Island_Red_Crab.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Christmas_Island_Red_Crab.jpg',
               desc: 'クリスマス島で毎年数千万匹が一斉産卵移動' },
           ]},
         ]},
@@ -527,15 +601,15 @@ const BRACHYURA_DATA = {
         { name: 'スナガニ上科', nameEn: 'Ocypodoidea', rank: 'superfamily', children: [
           { name: 'スナガニ科', nameEn: 'Ocypodidae', rank: 'family', crabs: [
             { jp: 'シオマネキ', sci: 'Uca arcuata',
-              img: 'Uca_arcuata.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/Uca_arcuata_by_OpenCage.jpg',
               desc: 'オスの片方のハサミが体の半分を占め、求愛に使う' },
             { jp: 'スナガニ', sci: 'Ocypode ceratophthalmus',
-              img: 'Ocypode_ceratophthalmus.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Ocypode_ceratophthalmus-dorsal.jpg',
               desc: '砂浜を時速16kmで疾走する世界最速のカニの一つ' },
           ]},
           { name: 'コメツキガニ科', nameEn: 'Dotillidae', rank: 'family', crabs: [
             { jp: 'コメツキガニ', sci: 'Scopimera globosa',
-              img: 'Scopimera_globosa.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Scopimera_globosa_20190804.jpg',
               desc: '干潟の砂を球状に丸めて捨てる行動（コメツキ）が特徴' },
           ]},
         ]},
@@ -543,7 +617,7 @@ const BRACHYURA_DATA = {
         { name: 'カクレガニ上科', nameEn: 'Pinnotheroidea', rank: 'superfamily', children: [
           { name: 'カクレガニ科', nameEn: 'Pinnotheridae', rank: 'family', crabs: [
             { jp: 'カクレガニ', sci: 'Pinnotheres pisum',
-              img: 'Pinnotheres_pisum.jpg',
+              img: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Pinnotheres_pisum.jpg',
               desc: 'イガイ・ホタテ・ホヤの体内に共生する小型ガニ' },
           ]},
         ]},
@@ -563,38 +637,38 @@ const ANOMURA_DATA = {
     { name: 'タラバガニ上科', nameEn: 'Lithodoidea', rank: 'superfamily', children: [
       { name: 'タラバガニ科', nameEn: 'Lithodidae', rank: 'family', crabs: [
         { jp: 'タラバガニ', sci: 'Paralithodes camtschaticus',
-          img: 'Paralithodes_camtschaticus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/5/51/Paralithodes_camtschaticus%2C_1.jpg',
           desc: '世界三大食用ガニの一つ。実はヤドカリの仲間で機能する脚は6本' },
         { jp: 'アブラガニ', sci: 'Paralithodes platypus',
-          img: 'Paralithodes_platypus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Paralithodes_platypus.jpg',
           desc: 'ベーリング海産。タラバガニより甲羅が広く平ら。脂乗りが良い' },
         { jp: 'ハナサキガニ', sci: 'Paralithodes brevipes',
-          img: 'Paralithodes_brevipes.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Paralithodes_brevipes.jpg',
           desc: '北海道・根室産。棘が多く見た目が華やか。味噌汁が有名' },
       ]},
     ]},
     { name: 'オカヤドカリ上科', nameEn: 'Coenobitoidea', rank: 'superfamily', children: [
       { name: 'オカヤドカリ科', nameEn: 'Coenobitidae', rank: 'family', crabs: [
         { jp: 'ヤシガニ', sci: 'Birgus latro',
-          img: 'Birgus_latro.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Birgus_latro.jpg',
           desc: '現存する最大の陸生節足動物。ヤシの実を割って食べる。沖縄・小笠原で見られる' },
         { jp: 'オカヤドカリ', sci: 'Coenobita brevimanus',
-          img: 'Coenobita_brevimanus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/4/40/Coenobita_brevimanus.jpg',
           desc: '陸で生活するヤドカリ。日本では国の天然記念物に指定されている' },
       ]},
     ]},
     { name: 'カニダマシ上科', nameEn: 'Galatheoidea', rank: 'superfamily', children: [
       { name: 'カニダマシ科', nameEn: 'Porcellanidae', rank: 'family', crabs: [
         { jp: 'カニダマシ', sci: 'Petrolisthes japonicus',
-          img: 'Petrolisthes_japonicus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Petrolisthes_japonicus_001.JPG',
           desc: 'カニに似るが機能する歩脚は6本。触角が長く異尾類の特徴を残す' },
         { jp: 'ベニホンヤドカリダマシ', sci: 'Neopetrolisthes maculatus',
-          img: 'Neopetrolisthes_maculatus.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Neopetrolisthes_maculatus.jpg',
           desc: 'イソギンチャクと必ず共生する。白地に赤い斑点の美しい模様' },
       ]},
       { name: 'コシオリエビ科', nameEn: 'Munididae', rank: 'family', crabs: [
         { jp: 'コシオリエビ', sci: 'Munida quadrispina',
-          img: 'Munida_quadrispina.jpg',
+          img: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/Munida_quadrispina_1.jpg',
           desc: '腰を折り曲げたような姿が名の由来。英名スクワットロブスター。食用にもなる' },
       ]},
     ]},
@@ -608,13 +682,13 @@ const XIPHOSURA_DATA = {
   children: [
     { name: 'カブトガニ科', nameEn: 'Limulidae', rank: 'family', crabs: [
       { jp: 'カブトガニ', sci: 'Tachypleus tridentatus',
-        img: 'Tachypleus_tridentatus.jpg',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Tachypleus_tridentatus.jpg',
         desc: '日本・東アジア産の「生きた化石」。青い血液が医薬品の安全検査に使われる。国の天然記念物' },
       { jp: 'アメリカカブトガニ', sci: 'Limulus polyphemus',
-        img: 'Limulus_polyphemus.jpg',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Limulus_polyphemus.jpg',
         desc: '北米大西洋岸産。約4億5千万年前からほぼ形を変えていない。春に大量産卵上陸で有名' },
       { jp: 'マルオカブトガニ', sci: 'Carcinoscorpius rotundicauda',
-        img: 'Carcinoscorpius_rotundicauda.jpg',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Carcinoscorpius_rotundicauda.jpg',
         desc: '東南アジア産。尾が丸い断面なのが特徴。毒を持つことがあり食用注意' },
     ]},
   ]
@@ -733,25 +807,102 @@ function buildCard(crab) {
   const wrap = document.createElement('div');
   wrap.className = 'crab-img-wrap';
 
-  const img = document.createElement('img');
-  img.alt = crab.jp;
-  img.loading = 'lazy';
-  img.src = COM(crab.img);
-  img.onerror = () => {
+  if (crab.img) {
+    const img = document.createElement('img');
+    img.alt = crab.jp;
+    img.loading = 'lazy';
+    img.onerror = () => { wrap.innerHTML = '<div class="img-placeholder">🦀</div>'; };
+    img.src = crab.img.startsWith('https://') ? crab.img : COM(crab.img);
+    wrap.appendChild(img);
+  } else {
     wrap.innerHTML = '<div class="img-placeholder">🦀</div>';
-  };
-  wrap.appendChild(img);
+  }
   card.appendChild(wrap);
 
   const info = document.createElement('div');
   info.className = 'crab-info';
+  const wikiUrl = `https://ja.wikipedia.org/wiki/${encodeURIComponent(crab.jp)}`;
   info.innerHTML =
     `<div class="crab-jp">${crab.jp}</div>` +
     `<div class="crab-sci">${crab.sci}</div>` +
-    (crab.desc ? `<div class="crab-desc">${crab.desc}</div>` : '');
+    (crab.desc ? `<div class="crab-desc">${crab.desc}</div>` : '') +
+    `<div class="crab-wiki"><a href="${wikiUrl}" target="_blank" rel="noopener">Wikipedia →</a></div>`;
   card.appendChild(info);
 
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    addToPanel(crab, card);
+  });
+
   return card;
+}
+
+// ─── Selected panel ────────────────────────────────────────────────────────
+const selectedCrabs = new Map(); // sci → { panelCard, leftCard }
+
+function revealInTree(el) {
+  let node = el.parentElement;
+  while (node) {
+    if (node.classList.contains('collapsible') && node.style.display === 'none') {
+      node.style.display = '';
+      const header = node.previousElementSibling;
+      if (header) {
+        const icon = header.querySelector('.toggle-icon');
+        if (icon) icon.classList.add('open');
+      }
+    }
+    node = node.parentElement;
+  }
+}
+
+function addToPanel(crab, leftCard) {
+  if (selectedCrabs.has(crab.sci)) {
+    selectedCrabs.get(crab.sci).panelCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  const panelCard = document.createElement('div');
+  panelCard.className = 'selected-card';
+
+  if (crab.img) {
+    const img = document.createElement('img');
+    img.alt = crab.jp;
+    img.onerror = () => img.replaceWith(makePh());
+    img.src = crab.img;
+    panelCard.appendChild(img);
+  } else {
+    panelCard.appendChild(makePh());
+  }
+
+  const name = document.createElement('div');
+  name.className = 'selected-card-name';
+  name.textContent = crab.jp;
+  panelCard.appendChild(name);
+
+  const del = document.createElement('button');
+  del.className = 'selected-delete';
+  del.textContent = '削除';
+  del.addEventListener('click', () => { panelCard.remove(); selectedCrabs.delete(crab.sci); });
+  panelCard.appendChild(del);
+
+  panelCard.style.cursor = 'pointer';
+  panelCard.addEventListener('click', e => {
+    if (e.target.closest('button')) return;
+    revealInTree(leftCard);
+    leftCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.getElementById('selected-list').appendChild(panelCard);
+  selectedCrabs.set(crab.sci, { panelCard, leftCard });
+  panelCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function makePh() {
+  const d = document.createElement('div');
+  d.className = 'selected-img-ph';
+  d.textContent = '🦀';
+  return d;
 }
 
 // ─── Global expand / collapse ──────────────────────────────────────────────
