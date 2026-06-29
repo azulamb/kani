@@ -211,6 +211,28 @@
     }
     .btn:hover { background: #1a4060; }
 
+    .search-input {
+      background: #0d2e44;
+      border: 1px solid #2e5a78;
+      color: #d0dde8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      margin: 0 4px;
+      width: 180px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .15s;
+    }
+    .search-input:focus { border-color: #7ecef4; }
+    .search-input::placeholder { color: #4a7fa0; }
+
+    .crab-card.search-match {
+      border-color: #7ecef4;
+      box-shadow: 0 0 8px rgba(126, 206, 244, .35);
+    }
+    .crab-card.search-nomatch { opacity: .25; }
+
     /* ── Source note ──────────────────────────── */
     footer {
       text-align: center;
@@ -358,6 +380,7 @@
     <div class="controls">
       <button class="btn" onclick="setAll(true)">すべて展開</button>
       <button class="btn" onclick="setAll(false)">すべて折りたたむ</button>
+      <input type="search" id="search-input" class="search-input" placeholder="カニを検索…" oninput="searchCrabs(this.value)">
     </div>
     <div id="tree" class="tree"></div>
   </div>
@@ -1015,6 +1038,30 @@ function setAll(open) {
   });
   document.querySelectorAll('.toggle-icon').forEach(el => {
     if (el.textContent === '▶') el.classList.toggle('open', open);
+  });
+}
+
+// ─── Search ────────────────────────────────────────────────────────────────
+function searchCrabs(query) {
+  const cards = document.querySelectorAll('.crab-card');
+  if (!query.trim()) {
+    cards.forEach(c => c.classList.remove('search-match', 'search-nomatch'));
+    return;
+  }
+  const q = query.trim().toLowerCase();
+  setAll(false);
+  cards.forEach(card => {
+    const jp   = card.querySelector('.crab-jp')?.textContent.toLowerCase()   || '';
+    const sci  = card.querySelector('.crab-sci')?.textContent.toLowerCase()  || '';
+    const desc = card.querySelector('.crab-desc')?.textContent.toLowerCase() || '';
+    if (jp.includes(q) || sci.includes(q) || desc.includes(q)) {
+      card.classList.add('search-match');
+      card.classList.remove('search-nomatch');
+      revealInTree(card);
+    } else {
+      card.classList.add('search-nomatch');
+      card.classList.remove('search-match');
+    }
   });
 }
 
